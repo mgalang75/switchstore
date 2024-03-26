@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout 
+from django.contrib.auth import authenticate, login, logout
 from .form import *
 from .models import *
 
@@ -10,15 +10,10 @@ def landing(request, category=None):
         
         context["products"] = Products.objects.all()
         context["categories"] = Categories.objects.all()
-        print(print(context["categories"]))
-
         return render(request, "index.html", context)
     else:
-        print(category)
         context["products"] = Products.objects.filter(category_id = category)
-        print(context["products"])
         context["categories"] = Categories.objects.all()
-        print(print(context["categories"]))
         return render(request, "index.html", context)
 
 
@@ -38,11 +33,11 @@ def detail_view(request, id):
 def contact_view(request):
     if request.method == "POST":
         form = ContactsForm(request.POST)
-        print(form)
         if form.is_valid():
             form.save()
             return redirect('contact')
     return render(request, "contact.html")
+
 
 def cart_view(request):
     if request.method == "POST":
@@ -66,7 +61,7 @@ def register_view(request):
             return redirect('login')
     else:
         form = SignupForm()
-    return render(request, "register.html")
+    return render(request, "register.html", { "form": form })
 
 def login_view(request):
     if request.method == 'POST':
@@ -77,14 +72,15 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user:
                 login(request, user)    
-                return redirect('index')
+                return redirect('landing')
     else:
         form = LoginForm()
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'login.html', { 'form': form })
 
 def logout_view(request):
     logout(request)
     return redirect('login')
-        
+
+
 def custom_404(request, exception):
     return render(request, "404.html", status=404)
